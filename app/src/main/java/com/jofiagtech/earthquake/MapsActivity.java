@@ -91,7 +91,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 String time = dateFormat.format(new Date(properties.getLong("time")).getTime());
                                 earthQuake.setTime(time);
                                 earthQuake.setPlace(properties.getString("place"));
-                                earthQuake.setDetailsLink(properties.getString("url"));
+                                earthQuake.setDetailsLink(properties.getString("detail"));
                                 earthQuake.setMagnitude(properties.getDouble("mag"));
                                 earthQuake.setLatitude(latLng.latitude);
                                 earthQuake.setLongitude(latLng.longitude);
@@ -100,7 +100,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 mMap.addMarker(new MarkerOptions()
                                         .position(latLng)
                                         .title(earthQuake.getPlace())
-                                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+                                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)))
+                                .setTag(earthQuake.getDetailsLink());
 
                                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 1));
                             }
