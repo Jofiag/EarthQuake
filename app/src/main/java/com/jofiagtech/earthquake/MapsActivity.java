@@ -34,6 +34,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -60,6 +62,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void getEarthQuakes() {
+        final EarthQuake earthQuake = new EarthQuake();
         JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.GET, Constants.URL,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -78,7 +81,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                 LatLng latLng = new LatLng(coordinates.getLong(0), coordinates.getLong(1));
 
-                                Log.d("JSON", "Coordinates : " + latLng.latitude + ", " + latLng.longitude);
+                                //Log.d("JSON", "Coordinates : " + latLng.latitude + ", " + latLng.longitude);
+
+                                //Setting up the earthQuake
+                                DateFormat dateFormat = DateFormat.getDateInstance();
+                                String time = dateFormat.format(new Date(properties.getLong("time")).getTime());
+                                earthQuake.setTime(time);
+                                earthQuake.setPlace(properties.getString("place"));
+                                earthQuake.setDetailsLink(properties.getString("url"));
+                                earthQuake.setMagnitude(properties.getDouble("mag"));
+                                earthQuake.setLatitude(latLng.latitude);
+                                earthQuake.setLongitude(latLng.longitude);
+                                earthQuake.setType(properties.getString("type"));
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();

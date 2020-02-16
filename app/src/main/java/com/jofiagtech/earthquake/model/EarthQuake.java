@@ -3,7 +3,7 @@ package com.jofiagtech.earthquake.model;
 public class EarthQuake {
     private String place;
     private double magnitude;
-    private long time;
+    private String time;
     private String detailsLink;
     private String type;
     private double latitude;
@@ -12,7 +12,7 @@ public class EarthQuake {
     public EarthQuake() {
     }
 
-    public EarthQuake(String place, double magnitude, long time, String detailsLink, String type, double latitude, double longitude) {
+    public EarthQuake(String place, double magnitude, String time, String detailsLink, String type, double latitude, double longitude) {
         this.place = place;
         this.magnitude = magnitude;
         this.time = time;
@@ -38,11 +38,11 @@ public class EarthQuake {
         this.magnitude = magnitude;
     }
 
-    public long getTime() {
+    public String getTime() {
         return time;
     }
 
-    public void setTime(long time) {
+    public void setTime(String time) {
         this.time = time;
     }
 
