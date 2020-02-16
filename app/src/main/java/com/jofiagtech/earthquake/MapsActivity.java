@@ -27,15 +27,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LocationListener mLocationListener;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
 
     }
 
@@ -44,29 +42,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        mLocationListener = new LocationListener()
-        {
+        mLocationListener = new LocationListener() {
             @Override
-            public void onLocationChanged(Location location)
-            {
+            public void onLocationChanged(Location location) {
 
             }
 
             @Override
-            public void onStatusChanged(String provider, int status, Bundle extras)
-            {
+            public void onStatusChanged(String provider, int status, Bundle extras) {
 
             }
 
             @Override
-            public void onProviderEnabled(String provider)
-            {
+            public void onProviderEnabled(String provider) {
 
             }
 
             @Override
-            public void onProviderDisabled(String provider)
-            {
+            public void onProviderDisabled(String provider) {
 
             }
         };
