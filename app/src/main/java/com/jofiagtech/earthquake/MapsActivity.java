@@ -25,6 +25,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.jofiagtech.earthquake.model.EarthQuake;
@@ -93,6 +94,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 earthQuake.setLatitude(latLng.latitude);
                                 earthQuake.setLongitude(latLng.longitude);
                                 earthQuake.setType(properties.getString("type"));
+
+                                mMap.addMarker(new MarkerOptions()
+                                        .position(latLng)
+                                        .title(earthQuake.getPlace())
+                                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 1));
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
