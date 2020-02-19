@@ -14,6 +14,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -27,6 +28,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.jofiagtech.earthquake.model.EarthQuake;
 import com.jofiagtech.earthquake.util.Constants;
@@ -40,7 +42,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMarkerClickListener {
 
     private GoogleMap mMap;
     private LocationManager mLocationManager;
@@ -185,6 +187,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocationListener);
 
             Location location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            LatLng position = null;
+            if (location != null) {
+                position = new LatLng(location.getLatitude(), location.getLongitude());
+                mMap.addMarker(new MarkerOptions().position(position).title("My position"));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 8));
+            }
+            else
+                Toast.makeText(MapsActivity.this, "Getting Location failed", Toast.LENGTH_LONG).show();
         }
+    }
+
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        return false;
     }
 }
