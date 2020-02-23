@@ -153,22 +153,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         };
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                    checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
                 ActivityCompat.requestPermissions(this,
                         new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, 1);
             }
         }
-        else{
-            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                    0, 0, mLocationListener);
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                0, 0, mLocationListener);
 
-            Location location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            assert location != null;
-            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(latLng).title("My Location"));
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 8));
-
-        }
+        Location location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        assert location != null;
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        mMap.addMarker(new MarkerOptions().position(latLng).title("My Location"));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 8));
 
         // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(-34, 151);
