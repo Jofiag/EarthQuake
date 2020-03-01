@@ -31,6 +31,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.jofiagtech.earthquake.model.EarthQuake;
+import com.jofiagtech.earthquake.ui.CustomInfoWindow;
 import com.jofiagtech.earthquake.util.Constants;
 
 import org.json.JSONArray;
@@ -62,7 +63,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mQueue = Volley.newRequestQueue(this);
 
         getEarthQuakes();
-
     }
 
     private void getEarthQuakes() {
@@ -74,7 +74,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         try {
                             int j = -1;
                             JSONArray feature = response.getJSONArray("features");
-                            for (int i = 0; i < Constants.LIMIT; i++){
+                            for (int i = 0; i < Constants.LIMIT; i++) {
                                 //Get property
                                 JSONObject properties = feature.getJSONObject(i).getJSONObject("properties");
 
@@ -104,8 +104,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         .title(earthQuake.getPlace())
                                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
                                         .snippet("Magnitude : " + earthQuake.getMagnitude() + "\n"
-                                                +"Date : " + earthQuake.getTime()))
-                                .setTag(earthQuake.getDetailsLink());
+                                                + "Date : " + earthQuake.getTime()))
+                                        .setTag(earthQuake.getDetailsLink());
 
                                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 1));
                             }
@@ -124,11 +124,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mQueue.add(jsonObject);
     }
 
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        mMap.setInfoWindowAdapter(new CustomInfoWindow(getApplicationContext()));
+
+        mMap.setOnInfoWindowClickListener(this);
+        mMap.setOnMarkerClickListener(this);
+
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         mLocationListener = new LocationListener() {
             @Override
@@ -154,24 +158,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                    checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-                ActivityCompat.requestPermissions(this,
-                        new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+                    checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
             }
+
+            getAndShowPhoneLocation();
         }
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                0, 0, mLocationListener);
 
-        Location location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        assert location != null;
-        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-        mMap.addMarker(new MarkerOptions().position(latLng).title("My Location"));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 8));
-
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
     }
 
@@ -179,30 +173,81 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                     == PackageManager.PERMISSION_GRANTED)
                 mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocationListener);
 
-            Location location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            LatLng position = null;
-            if (location != null) {
-                position = new LatLng(location.getLatitude(), location.getLongitude());
-                mMap.addMarker(new MarkerOptions().position(position).title("My position"));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 8));
-            }
-            else
-                Toast.makeText(MapsActivity.this, "Getting Location failed", Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void getAndShowPhoneLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            return;
+        }
+
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                0, 0, mLocationListener);
+
+        Location location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+        if (location != null){
+            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+            mMap.addMarker(new MarkerOptions().position(latLng).title("My Location"));
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 8));
+        }
+        else
+            Toast.makeText(getApplicationContext(), "Finding location failed !", Toast.LENGTH_LONG);
+
     }
 
     @Override
     public void onInfoWindowClick(Marker marker) {
+        if (!marker.getTitle().equals("My Location"))
+            getQuakeDetails(marker.getTag().toString());
 
+        Toast.makeText(getApplicationContext(), marker.getTitle(), Toast.LENGTH_LONG).show();
     }
 
     @Override
     public boolean onMarkerClick(Marker marker) {
         return false;
+    }
+
+    private void getQuakeDetails(String url){
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        String detailsUrl = "";
+                        try {
+                            JSONObject properties = response.getJSONObject("properties");
+                            JSONObject products = properties.getJSONObject("products");
+                            JSONArray geoserve = products.getJSONArray("geoserve");
+
+                            for (int i = 0; i < geoserve.length(); i++){
+                                JSONObject geoserveObj = geoserve.getJSONObject(i);
+                                JSONObject contents = geoserveObj.getJSONObject("contents");
+                                JSONObject geoserveJson = contents.getJSONObject("geoserve.json");
+
+                                detailsUrl = geoserveJson.getString("url");
+                            }
+                            Log.d("JSON", "onResponse: " + detailsUrl);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                });
+
+        mQueue.add(jsonObjectRequest);
     }
 }
