@@ -274,6 +274,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         StringBuilder stringBuilder =  new StringBuilder();
 
                         try {
+
+                            if (response.has("tectonicSummary") && response.getString("tectonicSummary") != null){
+                                JSONObject tectonicSummary = response.getJSONObject("tectonicSummary");
+
+                                if (tectonicSummary.has("text") && tectonicSummary.getString("text") != null){
+                                    String text = tectonicSummary.getString("text");
+                                    htmlPopup.loadDataWithBaseURL(null, text, "text/html", "UTF_8", null);
+                                }
+                            }
+
                             JSONArray cities = response.getJSONArray("cities");
 
                             for (int i = 0; i < cities.length(); i++){
