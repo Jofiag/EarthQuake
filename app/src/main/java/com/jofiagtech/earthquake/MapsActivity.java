@@ -6,7 +6,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
-import android.app.DownloadManager;
+import android.app.AlertDialog;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -14,6 +14,10 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.webkit.WebView;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -39,9 +43,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMarkerClickListener {
 
@@ -50,6 +52,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LocationListener mLocationListener;
 
     private RequestQueue mQueue;
+
+    private AlertDialog.Builder mBuilder;
+    private AlertDialog mDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +69,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         getEarthQuakes();
     }
-
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -123,14 +127,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-
-
     @Override
     public void onInfoWindowClick(Marker marker) {
         if (!marker.getTitle().equals("My Location"))
             getQuakeDetails(marker.getTag().toString());
 
-        Toast.makeText(getApplicationContext(), marker.getTitle(), Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplicationContext(), marker.getTitle(), Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -216,6 +218,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 detailsUrl = geoserveJson.getString("url");
                             }
                             Log.d("JSON", "onResponse: " + detailsUrl);
+                            getMoreDetails(detailsUrl);
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -253,5 +256,68 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         else
             Toast.makeText(getApplicationContext(), "Finding location failed !", Toast.LENGTH_LONG);
 
+    }
+
+    private void getMoreDetails(String url){
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        mBuilder = new AlertDialog.Builder(MapsActivity.this);
+                        View view = getLayoutInflater().inflate(R.layout.popup, null);
+
+                        Button dismissPopupTop = view.findViewById(R.id.dismiss_popup_top);
+                        Button dismissPopup = view.findViewById(R.id.dismiss_popup);
+                        TextView listOfCities = view.findViewById(R.id.list_of_cities);
+                        WebView htmlPopup = view.findViewById(R.id.html_web_view);
+
+                        StringBuilder stringBuilder =  new StringBuilder();
+
+                        try {
+                            JSONArray cities = response.getJSONArray("cities");
+
+                            for (int i = 0; i < cities.length(); i++){
+                                JSONObject city = cities.getJSONObject(i);
+
+                                stringBuilder.append("City : " + city.getString("name") + "\n"
+                                                    +"Distance : " + city.getString("distance") + "\n"
+                                                    +"Population : " + city.getString("population") + "\n");
+
+                                stringBuilder.append("\n\n");
+
+                                listOfCities.setText(stringBuilder);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        dismissPopupTop.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mDialog.dismiss();
+                            }
+                        });
+
+                        dismissPopup.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mDialog.dismiss();
+                            }
+                        });
+
+                        mBuilder.setView(view);
+                        mDialog = mBuilder.create();
+                        mDialog.show();
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                });
+
+        mQueue.add(jsonObjectRequest);
     }
 }
