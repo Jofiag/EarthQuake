@@ -192,7 +192,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 mMap.addMarker(new MarkerOptions()
                                         .position(latLng)
                                         .title(earthQuake.getPlace())
-                                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                                        .icon(iconColors[Constants.randomInt(iconColors.length, 0)])
                                         .snippet("Magnitude : " + earthQuake.getMagnitude() + "\n"
                                                 + "Date : " + earthQuake.getTime()))
                                         .setTag(earthQuake.getDetailsLink());
