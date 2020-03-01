@@ -64,7 +64,7 @@
                 android:textStyle="bold"
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
-                android:layout_below="@+id/list_of_cities"/>
+                android:layout_below="@+id/html_web_view"/>
 
         </RelativeLayout>
 

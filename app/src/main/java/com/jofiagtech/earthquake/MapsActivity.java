@@ -30,6 +30,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -56,6 +57,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private AlertDialog.Builder mBuilder;
     private AlertDialog mDialog;
 
+    private BitmapDescriptor[] iconColors;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +67,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        iconColors = new BitmapDescriptor[]{
+          BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE),
+          BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE),
+          BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN),
+          BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN),
+          BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA),
+          BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE),
+          //BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED),
+          BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE),
+          BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)
+        };
 
         mQueue = Volley.newRequestQueue(this);
 
@@ -182,7 +197,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                 + "Date : " + earthQuake.getTime()))
                                         .setTag(earthQuake.getDetailsLink());
 
-                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 4));
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 1));
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
