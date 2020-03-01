@@ -107,7 +107,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                 + "Date : " + earthQuake.getTime()))
                                         .setTag(earthQuake.getDetailsLink());
 
-                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 1));
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 4));
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -196,7 +196,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (location != null){
             LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
             mMap.addMarker(new MarkerOptions().position(latLng).title("My Location"));
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 8));
+            //mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+            //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 8));
         }
         else
             Toast.makeText(getApplicationContext(), "Finding location failed !", Toast.LENGTH_LONG);
