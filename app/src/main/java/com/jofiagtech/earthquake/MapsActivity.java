@@ -8,6 +8,7 @@ import androidx.fragment.app.FragmentActivity;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -32,6 +33,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -174,7 +176,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 //Get Coordinates
                                 JSONArray coordinates = geometry.getJSONArray("coordinates");
 
-                                LatLng latLng = new LatLng(coordinates.getLong(0), coordinates.getLong(1));
+                                double lat = coordinates.getDouble(0);
+                                double lon = coordinates.getDouble(1);
+                                LatLng latLng = new LatLng(lat, lon);
 
                                 //Log.d("JSON", "Coordinates : " + latLng.latitude + ", " + latLng.longitude);
 
@@ -185,8 +189,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 earthQuake.setPlace(properties.getString("place"));
                                 earthQuake.setDetailsLink(properties.getString("detail"));
                                 earthQuake.setMagnitude(properties.getDouble("mag"));
-                                earthQuake.setLatitude(latLng.latitude);
-                                earthQuake.setLongitude(latLng.longitude);
+                                earthQuake.setLatitude(lat);
+                                earthQuake.setLongitude(lon);
                                 earthQuake.setType(properties.getString("type"));
 
                                 mMap.addMarker(new MarkerOptions()
@@ -196,6 +200,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         .snippet("Magnitude : " + earthQuake.getMagnitude() + "\n"
                                                 + "Date : " + earthQuake.getTime()))
                                         .setTag(earthQuake.getDetailsLink());
+
+                                //Add circle to marker that have magnitude > x
+                                if (earthQuake.getMagnitude() >= 2.0){
+                                    CircleOptions circleOptions = new CircleOptions();
+                                    circleOptions.center(new LatLng(earthQuake.getLatitude(), earthQuake.getLongitude()));
+                                    circleOptions.radius(30000);
+                                    circleOptions.strokeWidth(2.5f);
+                                    circleOptions.fillColor(Color.RED);
+                                    /*mMap.addMarker(new MarkerOptions()
+                                            .position(latLng)
+                                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));*/
+
+                                    mMap.addCircle(circleOptions);
+                                }
 
                                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 1));
                             }
