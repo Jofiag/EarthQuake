@@ -1,4 +1,4 @@
-package com.jofiagtech.earthquake;
+package com.jofiagtech.earthquake.activities;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -37,6 +38,7 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.jofiagtech.earthquake.R;
 import com.jofiagtech.earthquake.model.EarthQuake;
 import com.jofiagtech.earthquake.ui.CustomInfoWindow;
 import com.jofiagtech.earthquake.util.Constants;
@@ -69,6 +71,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        Button showListButton = findViewById(R.id.show_list_btn);
+        showListButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MapsActivity.this, ListActivity.class);
+                startActivity(intent);
+            }
+        });
 
         iconColors = new BitmapDescriptor[]{
           BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE),
