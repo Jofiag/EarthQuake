@@ -175,7 +175,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            int j = -1;
                             JSONArray feature = response.getJSONArray("features");
                             for (int i = 0; i < Constants.LIMIT; i++) {
                                 //Get property
